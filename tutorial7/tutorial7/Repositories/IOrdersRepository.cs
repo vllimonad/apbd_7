@@ -5,4 +5,5 @@ namespace tutorial7.Repositories;
 public interface IOrdersRepository
 {
     Task<OrderDTO> DoesProductPurchaseExist(int id, int amount, DateTime time);
+    Task updateTime(int id, DateTime time);
 }

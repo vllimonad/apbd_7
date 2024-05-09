@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices.JavaScript;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using tutorial7.Repositories;
 
@@ -45,10 +43,13 @@ public class WarehouseController: ControllerBase
         var order = await oRepository.DoesProductPurchaseExist(IdProduct, Amount, CreatedAt);
         if (order.IdOrder != null)
         {
-            if (await pwRepository.DoesOrderExist(1))
+            Console.WriteLine(order.IdOrder);
+            if (await pwRepository.DoesOrderExist(order.IdOrder))
             {
                 return NotFound();
             }
+            oRepository.updateTime(order.IdOrder, DateTime.Now);
+            pwRepository.AddRecord(IdWarehouse, IdProduct, order.IdOrder, Amount, await pRepository.GetProductPrice(IdProduct));
         }
         return Ok();
     }

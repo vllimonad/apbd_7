@@ -1,3 +1,4 @@
+using System.Data;
 using System.Data.SqlClient;
 using tutorial7.Models.DTOs;
 
@@ -15,7 +16,7 @@ public class OrdersRepository: IOrdersRepository
     
     public async Task<OrderDTO> DoesProductPurchaseExist(int id, int amount, DateTime time)
     {
-        var query = "select IdOrder from Order where IdProduct = @id and Amount = @amount and CreatedAt < @time;";
+        var query = "select IdOrder from \"Order\" where IdProduct = @id and Amount = @amount and CreatedAt < @time;";
 
         using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Docker"));
         using SqlCommand command = new SqlCommand();
@@ -29,11 +30,30 @@ public class OrdersRepository: IOrdersRepository
         await connection.OpenAsync();
         var reader = await command.ExecuteReaderAsync();
         await reader.ReadAsync();
+
+        if (!reader.HasRows) throw new Exception();
         
         var orderDTO = new OrderDTO()
         {
-            IdOrder = reader.GetOrdinal("IdOrder")
+            IdOrder = reader.GetInt32("IdOrder")
         };
         return orderDTO;
     }
+
+    public async Task updateTime(int id, DateTime time)
+    {
+        var query = "update \"Order\" set FulfilledAt = @time where IdOrder = @id";
+
+        using SqlConnection connection = new SqlConnection(_configuration.GetConnectionString("Docker"));
+        using SqlCommand command = new SqlCommand();
+
+        command.Connection = connection;
+        command.CommandText = query;
+        command.Parameters.AddWithValue("@id", id);
+        command.Parameters.AddWithValue("@time", time);
+
+        await connection.OpenAsync();
+        await command.ExecuteNonQueryAsync();
+    }
+    
 }
