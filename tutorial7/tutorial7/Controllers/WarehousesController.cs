@@ -6,7 +6,7 @@ namespace tutorial7.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class WarehouseController: ControllerBase
+public class WarehousesController: ControllerBase
 {
 
     private readonly IProductsRepository pRepository;
@@ -14,7 +14,7 @@ public class WarehouseController: ControllerBase
     private readonly IWarehousesRepository wRepository;
     private readonly IProduct_WarehousesRepository pwRepository;
 
-    public WarehouseController(IProductsRepository pRepository, IWarehousesRepository wRepository, IOrdersRepository oRepository, IProduct_WarehousesRepository pwRepository)
+    public WarehousesController(IProductsRepository pRepository, IWarehousesRepository wRepository, IOrdersRepository oRepository, IProduct_WarehousesRepository pwRepository)
     {
         this.pRepository = pRepository;
         this.oRepository = oRepository;
@@ -22,7 +22,7 @@ public class WarehouseController: ControllerBase
         this.pwRepository = pwRepository;
     }
 
-    [HttpGet]
+    [HttpPost]
     public async Task<IActionResult> addProduct([Required] int IdProduct, [Required] int IdWarehouse, [Required] int Amount, DateTime CreatedAt)
     {
         if (!await pRepository.DoesProductExist(IdProduct))
@@ -51,6 +51,7 @@ public class WarehouseController: ControllerBase
             oRepository.updateTime(order.IdOrder, DateTime.Now);
             pwRepository.AddRecord(IdWarehouse, IdProduct, order.IdOrder, Amount, await pRepository.GetProductPrice(IdProduct));
         }
-        return Ok();
+
+        return Ok(order);
     }
 }
