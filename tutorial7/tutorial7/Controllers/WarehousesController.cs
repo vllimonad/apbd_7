@@ -40,18 +40,16 @@ public class WarehousesController: ControllerBase
             return NotFound();
         }
 
-        var order = await oRepository.DoesProductPurchaseExist(IdProduct, Amount, CreatedAt);
-        if (order.IdOrder != null)
+        var IdOrder = await oRepository.DoesProductPurchaseExist(IdProduct, Amount, CreatedAt);
+        if (IdOrder != null)
         {
-            Console.WriteLine(order.IdOrder);
-            if (await pwRepository.DoesOrderExist(order.IdOrder))
+            if (await pwRepository.DoesOrderExist(IdOrder))
             {
                 return NotFound();
             }
-            oRepository.updateTime(order.IdOrder, DateTime.Now);
-            pwRepository.AddRecord(IdWarehouse, IdProduct, order.IdOrder, Amount, await pRepository.GetProductPrice(IdProduct));
+            oRepository.updateTime(IdOrder, DateTime.Now);
+            pwRepository.AddRecord(IdWarehouse, IdProduct, IdOrder, Amount, await pRepository.GetProductPrice(IdProduct));
         }
-
-        return Ok(order);
+        return Ok(IdOrder);
     }
 }

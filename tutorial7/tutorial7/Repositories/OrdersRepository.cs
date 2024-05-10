@@ -14,7 +14,7 @@ public class OrdersRepository: IOrdersRepository
         _configuration = configuration;
     }
     
-    public async Task<OrderDTO> DoesProductPurchaseExist(int id, int amount, DateTime time)
+    public async Task<int> DoesProductPurchaseExist(int id, int amount, DateTime time)
     {
         var query = "select IdOrder from \"Order\" where IdProduct = @id and Amount = @amount and CreatedAt < @time;";
 
@@ -32,12 +32,7 @@ public class OrdersRepository: IOrdersRepository
         await reader.ReadAsync();
 
         if (!reader.HasRows) throw new Exception();
-        
-        var orderDTO = new OrderDTO()
-        {
-            IdOrder = reader.GetInt32("IdOrder")
-        };
-        return orderDTO;
+        return reader.GetInt32(reader.GetOrdinal("IdOrder"));
     }
 
     public async Task updateTime(int id, DateTime time)
